@@ -1,0 +1,40 @@
+{
+  "promotions": [
+    {
+      "id": "PROMO-001",
+      "name": "Urban Hoodie — Washed Black",
+      "description": "Heavyweight 400gsm fleece. Pre-washed for that lived-in look.",
+      "price": 59.99,
+      "original_price": 79.99,
+      "badge": "20% off",
+      "emoji": "🧥"
+    },
+    {
+      "id": "PROMO-002",
+      "name": "Trail Runner 3.0 — Slate Blue",
+      "description": "Responsive cushioning, recycled mesh upper. Born for the long run.",
+      "price": 89.99,
+      "original_price": 119.99,
+      "badge": "New arrival",
+      "emoji": "👟"
+    },
+    {
+      "id": "PROMO-003",
+      "name": "Classic Cap — Off White",
+      "description": "Unstructured 6-panel. One size fits most, adjustable strap.",
+      "price": 24.99,
+      "original_price": null,
+      "badge": "Bestseller",
+      "emoji": "🧢"
+    },
+    {
+      "id": "PROMO-004",
+      "name": "Merino Crew Socks — 3-pack",
+      "description": "Temperature-regulating merino wool. Cushioned sole, seamless toe.",
+      "price": 19.99,
+      "original_price": null,
+      "badge": "Bundle deal",
+      "emoji": "🧦"
+    }
+  ]
+}
