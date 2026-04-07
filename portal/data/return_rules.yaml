@@ -1,0 +1,115 @@
+# return_rules.yaml
+#
+# Rules are evaluated in descending priority order.
+# The first rule whose condition matches wins (deny or allow).
+# Conditions are simple expressions over two namespaces:
+#   item.*   — fields from Article (sku, quantity, quantity_returned,
+#               is_digital, is_final_sale, category, price)
+#   policy.* — fields from Order (return_window_days)
+#   days_since_delivery — integer computed at evaluation time
+#
+# Reason strings support {{ variable }} interpolation for the same variables.
+
+rules:
+  - id: "not_yet_delivered"
+    name: "Not Yet Delivered"
+    condition: "days_since_delivery < 0"
+    action: "deny"
+    reason: "This item has not been delivered yet and cannot be returned"
+    priority: 110
+
+  - id: "digital_items"
+    name: "Digital / Downloadable Items"
+    condition: "item.is_digital == true"
+    action: "deny"
+    reason: "Digital items cannot be returned"
+    priority: 100
+
+  - id: "final_sale"
+    name: "Final Sale Items"
+    condition: "item.is_final_sale == true"
+    action: "deny"
+    reason: "This is a final sale item and cannot be returned"
+    priority: 90
+
+  - id: "clearance"
+    name: "Clearance Items"
+    condition: "item.category == \"clearance\""
+    action: "deny"
+    reason: "Clearance items cannot be returned"
+    priority: 85
+
+  - id: "already_fully_returned"
+    name: "Already Fully Returned"
+    condition: "item.quantity_returned >= item.quantity"
+    action: "deny"
+    reason: "Item has already been fully returned"
+    priority: 80
+
+  # --- Per-category return windows (evaluated before the generic fallback) ---
+  # Each category gets a deny rule (window expired) and an allow rule (within
+  # window). Add new categories here; unconfigured categories fall through to
+  # the generic return_window_expired / within_return_window rules below.
+
+  # --- Per-category return windows (evaluated before the generic fallback) ---
+  # Each category gets a deny rule (window expired) and an allow rule (within
+  # window). Add new categories here; unconfigured categories fall through to
+  # the generic return_window_expired / within_return_window rules below.
+
+  - id: "electronics_window_expired"
+    name: "Electronics Return Window Expired"
+    condition: "item.category == \"electronics\" AND days_since_delivery > 14"
+    action: "deny"
+    reason: "Return window for electronics has expired ({{ days_since_delivery }} days since delivery, window is 14 days)"
+    priority: 79
+
+  - id: "electronics_within_window"
+    name: "Electronics Within Return Window"
+    condition: "item.category == \"electronics\" AND days_since_delivery <= 14"
+    action: "allow"
+    reason: ""
+    priority: 78
+
+  - id: "footwear_window_expired"
+    name: "Footwear Return Window Expired"
+    condition: "item.category == \"footwear\" AND days_since_delivery > 60"
+    action: "deny"
+    reason: "Return window for footwear has expired ({{ days_since_delivery }} days since delivery, window is 60 days)"
+    priority: 77
+
+  - id: "footwear_within_window"
+    name: "Footwear Within Return Window"
+    condition: "item.category == \"footwear\" AND days_since_delivery <= 60"
+    action: "allow"
+    reason: ""
+    priority: 76
+
+  - id: "apparel_window_expired"
+    name: "Apparel Return Window Expired"
+    condition: "item.category == \"apparel\" AND days_since_delivery > 30"
+    action: "deny"
+    reason: "Return window for apparel has expired ({{ days_since_delivery }} days since delivery, window is 30 days)"
+    priority: 75
+
+  - id: "apparel_within_window"
+    name: "Apparel Within Return Window"
+    condition: "item.category == \"apparel\" AND days_since_delivery <= 30"
+    action: "allow"
+    reason: ""
+    priority: 74
+
+  # --- Generic fallback (applies to all unconfigured categories) ---
+
+  - id: "return_window_expired"
+    name: "Return Window Expired"
+    condition: "days_since_delivery > policy.return_window_days"
+    action: "deny"
+    reason: "Return window has expired ({{ days_since_delivery }} days since delivery, window is {{ policy.return_window_days }} days)"
+    priority: 70
+
+  - id: "within_return_window"
+    name: "Within Return Window"
+    condition: "days_since_delivery <= policy.return_window_days"
+    action: "allow"
+    reason: ""
+    priority: 10
