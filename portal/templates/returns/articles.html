@@ -16,14 +16,19 @@
 
     <form
         id="return-selection-form"
+        method="post"
+        action=""
         x-data="{ selected: {}, hasSelection() { return Object.values(this.selected).some(Boolean); } }"
     >
+        {% csrf_token %}
         {% for row in article_rows %}
             <div class="article-card{% if not row.selectable %} article-card-muted{% endif %}">
                 <div class="article-selector">
                     <input
                         type="checkbox"
                         id="item-{{ forloop.counter }}"
+                        name="selected_skus"
+                        value="{{ row.result.article.sku }}"
                         class="item-checkbox"
                         {% if row.selectable %}
                             x-model="selected['item_{{ forloop.counter }}']"
@@ -44,7 +49,11 @@
                             ({{ row.result.article.quantity_returned }} returned)
                         {% endif %}
                     </div>
-                    {% if not row.selectable %}
+                    {% if row.pending_qty %}
+                        <div class="help-text mt-1">
+                            <span class="badge badge-warning">Return processing ({{ row.pending_qty }})</span>
+                        </div>
+                    {% elif not row.selectable %}
                         <div class="help-text mt-1">
                             {% if not row.result.returnable and row.result.reason %}
                                 {{ row.result.reason }}
@@ -59,6 +68,7 @@
                     <label for="qty-{{ forloop.counter }}" class="qty-label">Return qty</label>
                     <select
                         id="qty-{{ forloop.counter }}"
+                        name="qty_{{ row.result.article.sku }}"
                         class="qty-select"
                         {% if row.selectable %}
                             :disabled="!selected['item_{{ forloop.counter }}']"
@@ -80,7 +90,7 @@
             <a href="{% url 'lookup' %}" class="btn btn-secondary">&larr; Back to lookup</a>
             <button
                 id="continue-btn"
-                type="button"
+                type="submit"
                 class="btn btn-primary continue-btn"
                 :disabled="!hasSelection()"
                 disabled

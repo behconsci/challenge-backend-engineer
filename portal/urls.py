@@ -9,4 +9,9 @@ urlpatterns = [
         views.ArticlesView.as_view(),
         name="articles",
     ),
+    path(
+        "<str:order_number>/confirm/",
+        views.ConfirmView.as_view(),
+        name="confirm",
+    ),
 ]

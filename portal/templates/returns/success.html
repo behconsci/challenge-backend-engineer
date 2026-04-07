@@ -1,0 +1,15 @@
+{% extends "returns/base.html" %}
+
+{% block title %}Return processed &mdash; Returns Portal{% endblock %}
+
+{% block content %}
+    <div class="text-center" style="padding: 3rem 1rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">&#x2705;</div>
+        <h1 style="margin-bottom: 0.75rem;">Return processed!</h1>
+        <p style="color: var(--color-text-secondary); font-size: 1rem; max-width: 420px; margin: 0 auto 2rem;">
+            Your return for order <strong>{{ order.order_number }}</strong> has been processed successfully
+            and your money is on its way back to you.
+        </p>
+        <a href="{% url 'lookup' %}" class="btn btn-primary">Return another order</a>
+    </div>
+{% endblock %}
