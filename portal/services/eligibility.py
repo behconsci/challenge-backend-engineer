@@ -99,7 +99,7 @@ def _evaluate_clause(clause: str, ctx: dict[str, Any]) -> bool:
     lhs_token, op, rhs_token = m.group(1), m.group(2), m.group(3)
     lhs = _resolve(lhs_token, ctx)
     rhs = _resolve(rhs_token, ctx)
-    return _OP_MAP[op](lhs, rhs)
+    return bool(_OP_MAP[op](lhs, rhs))
 
 
 def _evaluate_condition(condition: str, ctx: dict[str, Any]) -> bool:
@@ -115,11 +115,11 @@ _TEMPLATE_RE = re.compile(r"\{\{\s*(.+?)\s*\}\}")
 
 
 def _render_reason(template: str, ctx: dict[str, Any]) -> str:
-    def _sub(m: re.Match) -> str:
+    def _sub(m: re.Match[str]) -> str:
         try:
             return str(_resolve(m.group(1), ctx))
         except (KeyError, TypeError):
-            return m.group(0)
+            return str(m.group(0))
     return _TEMPLATE_RE.sub(_sub, template)
 
 

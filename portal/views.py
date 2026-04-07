@@ -1,6 +1,7 @@
 import json
 import time
 from pathlib import Path
+from typing import Any
 
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
@@ -13,9 +14,10 @@ from portal.services.order_store import find_order, get_order
 _PROMOTIONS_PATH = Path(__file__).resolve().parent / "data" / "promotions.json"
 
 
-def _load_promotions() -> list[dict]:
+def _load_promotions() -> list[dict[str, Any]]:
     with _PROMOTIONS_PATH.open() as f:
-        return json.load(f)["promotions"]
+        data: list[dict[str, Any]] = json.load(f)["promotions"]
+        return data
 
 
 def _verify_session(request: HttpRequest, order_number: str) -> bool:
