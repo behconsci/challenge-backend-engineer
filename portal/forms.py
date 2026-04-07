@@ -21,3 +21,8 @@ class LookupForm(forms.Form):
         help_text="Enter the email address or zip code used for the order.",
         widget=forms.TextInput(attrs={"placeholder": "Email or zip code"}),
     )
+    token = forms.CharField(
+        max_length=200,
+        required=False,
+        widget=forms.HiddenInput(),
+    )

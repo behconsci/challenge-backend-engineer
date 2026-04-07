@@ -19,6 +19,7 @@ from portal.types import Article, ArticleEligibility, Order
 class LookupRequestSerializer(serializers.Serializer[dict[str, Any]]):
     order_number = serializers.CharField()
     identifier = serializers.CharField()
+    token = serializers.CharField(required=False, default="")
 
 
 class LookupResponseSerializer(serializers.Serializer[dict[str, Any]]):
@@ -78,6 +79,7 @@ class ReturnsViewSet(viewsets.ViewSet):
         order = find_order(
             form.cleaned_data["order_number"],
             form.cleaned_data["identifier"],
+            request_serializer.validated_data.get("token", ""),
         )
         if order is None:
             return Response(
@@ -86,6 +88,8 @@ class ReturnsViewSet(viewsets.ViewSet):
             )
 
         request.session["order_number"] = order.order_number
+        request.session["identifier"] = form.cleaned_data["identifier"]
+        request.session["return_token"] = form.cleaned_data.get("token", "")
 
         payload = {
             "order_number": order.order_number,
@@ -101,7 +105,14 @@ class ReturnsViewSet(viewsets.ViewSet):
     @action(detail=True, methods=["get"], url_path="articles")
     def articles(self, request: Request, pk: str | None = None) -> Response:
         order_number = pk or ""
-        if not request.session.get("order_number"):
+        identifier = request.session.get("identifier", "")
+        token = request.session.get("return_token", "")
+        if request.session.get("order_number") != order_number or not identifier:
+            return Response(
+                {"detail": "Order lookup is required before viewing articles."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        if find_order(order_number, identifier, token) is None:
             return Response(
                 {"detail": "Order lookup is required before viewing articles."},
                 status=status.HTTP_403_FORBIDDEN,

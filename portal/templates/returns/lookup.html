@@ -20,7 +20,10 @@
 
             <form method="post">
                 {% csrf_token %}
+                {# Token is injected from the URL query param and submitted as a hidden field #}
+                <input type="hidden" name="token" value="{{ token_from_url }}">
                 {% for field in form %}
+                    {% if field.is_hidden %}{% else %}
                     <div class="form-group">
                         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                         {{ field }}
@@ -31,6 +34,7 @@
                             <p class="help-text" style="color: var(--color-error);">{{ field.errors.0 }}</p>
                         {% endif %}
                     </div>
+                    {% endif %}
                 {% endfor %}
 
                 <button type="submit" class="btn btn-primary" style="width: 100%;">

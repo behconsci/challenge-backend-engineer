@@ -2,6 +2,7 @@
   "orders": [
     {
       "order_number": "RMA-1001",
+      "return_token": "mnJqysTweQXf4mbutgnyfSy4sq4pR-JIHAHSvgSZLF8",
       "email": "alex@example.com",
       "recipient": "Alex Meyer",
       "street": "Hauptstrasse 12, Apt 4B",
@@ -92,6 +93,7 @@
     },
     {
       "order_number": "RMA-1002",
+      "return_token": "mEw1P3KSGS9IM_uyLAR-GRE5ZUe768KZEXsvsCMJNXY",
       "email": "lee@example.com",
       "recipient": "Lee Schmidt",
       "street": "Rosental 45, c/o Office",

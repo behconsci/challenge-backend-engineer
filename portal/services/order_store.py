@@ -56,17 +56,23 @@ def _freshen_dates(order: Order) -> Order:
     return replace(order, delivery_date=new_delivery, order_date=new_delivery - gap)
 
 
-def find_order(order_number: str, identifier: str) -> Order | None:
-    """Look up an order by number and verify the email or zip matches.
+def find_order(order_number: str, identifier: str, token: str = "") -> Order | None:
+    """Look up an order verifying order number, email/zip, and return token.
 
-    Returns the mapped :class:`Order` on success, or ``None`` if the order
-    is not found or the identifier does not match.
+    All three must match when a token is present on the order.  This prevents
+    access via guessable order numbers or leaked email addresses alone.
+
+    Returns the mapped :class:`Order` on success, or ``None`` if any check fails.
     """
     for raw in _load_raw_orders():
-        if raw["order_number"] == order_number and (
-            raw["email"] == identifier or raw["zip"] == identifier
-        ):
-            return _freshen_dates(map_order(raw))
+        if raw["order_number"] != order_number:
+            continue
+        if raw["email"] != identifier and raw["zip"] != identifier:
+            continue
+        stored_token = raw.get("return_token", "")
+        if stored_token and token != stored_token:
+            continue
+        return _freshen_dates(map_order(raw))
     return None
 
 
