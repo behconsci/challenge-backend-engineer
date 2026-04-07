@@ -78,6 +78,22 @@ def map_order(raw: dict[str, Any]) -> Order:
     articles: list[Article] = []
 
     for item in _as_list_of_dicts(raw.get("articles")):
+        is_digital = bool(item.get("digital", False))
+        is_final_sale = bool(item.get("final_sale", False))
+        # Also detect digital/final-sale via tags
+        tags = [t.lower() for t in item.get("tags", []) if isinstance(t, str)]
+        if not is_digital and "digital-delivery" in tags:
+            is_digital = True
+        if not is_final_sale and "final-sale" in tags:
+            is_final_sale = True
+        # Prefer explicit `category`; fall back to the first segment of
+        # `product_type` (e.g. "Apparel > T-Shirts" → "apparel").
+        category = _as_str(item.get("category"))
+        if not category:
+            product_type = _as_str(item.get("product_type"))
+            if product_type:
+                category = product_type.split(">")[0].strip().lower()
+
         articles.append(
             Article(
                 sku=_as_str(item.get("sku")),
@@ -85,9 +101,9 @@ def map_order(raw: dict[str, Any]) -> Order:
                 quantity=_as_int(item.get("quantity"), default=1),
                 quantity_returned=_as_int(item.get("quantity_returned"), default=0),
                 price=_as_float(item.get("price")),
-                is_digital=False,
-                is_final_sale=False,
-                category="",
+                is_digital=is_digital,
+                is_final_sale=is_final_sale,
+                category=category,
             )
         )
 
@@ -115,5 +131,7 @@ def map_order(raw: dict[str, Any]) -> Order:
         city=city,
         order_date=order_date,
         delivery_date=delivery_date or order_date,
+        return_token=_as_str(raw.get("return_token")),
+        return_window_days=_as_int(raw.get("return_window_days"), default=30),
         articles=articles,
     )

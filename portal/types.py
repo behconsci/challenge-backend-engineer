@@ -33,6 +33,8 @@ class Order:
     city: str
     order_date: datetime
     delivery_date: datetime
+    return_token: str = ""
+    return_window_days: int = 30
     articles: list[Article] = field(default_factory=list)
 
 
