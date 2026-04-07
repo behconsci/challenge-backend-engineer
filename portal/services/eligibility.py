@@ -21,7 +21,7 @@ from typing import Any
 
 import yaml
 
-from portal.types import Article, ArticleEligibility, Order
+from portal.types import ArticleEligibility, Order
 
 _RULES_PATH = Path(__file__).resolve().parent.parent / "data" / "return_rules.yaml"
 
