@@ -12,6 +12,7 @@ def _make_raw_order(**overrides: object) -> dict[str, object]:
     """Create a raw order dict with sensible defaults."""
     base: RawOrder = {
         "order_number": "TEST-001",
+        "return_token": "test-token-001",
         "email": "test@example.com",
         "recipient": "Test User",
         "zip": "12345",
